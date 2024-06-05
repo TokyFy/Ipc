@@ -35,7 +35,13 @@ void putnumber(int n)
 
 void append_bit(t_byte* byte , bool bit)
 {
-  write(1, "-", 1);
+  if(bit)
+  {
+    write(1,"0",1);
+  }
+  else {
+   write(1,"1",1);
+  }
  	byte->size++;
   if(bit)
 	  byte->bits |= (1u << (8 - byte->size));
@@ -45,8 +51,6 @@ void append_byte(t_byte *byte)
 {	
   char *s = GLOBAL_BUFFER;
 	t_sizet len = strlen(s);
-
-  write(1, " ", 1);
 
   if(byte->bits ==  '\0')
   {
@@ -68,7 +72,7 @@ void append_byte(t_byte *byte)
    GLOBAL_BUFFER = temp;
    s = GLOBAL_BUFFER;
  }
-
+  write(1,"  ",2);
 	s[++len - 1] = (char)byte->bits;	
 	byte->size = 0;
 	byte->bits = 0;
@@ -81,11 +85,8 @@ void handle_sigurs1(int sig, siginfo_t *info, void *context)
   kill(info->si_pid, SIGUSR1);
 	if(byte.size != 8)
 	  	return;
+  
 	append_byte(&byte);
-  if(!byte.bits)
-  {
-    kill(info->si_pid, SIGUSR2);
-  }
 }
 
 

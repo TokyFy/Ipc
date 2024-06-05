@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
+/*   Updated: 2024/06/05 20:14:46 by franaivo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +37,8 @@ pid_t server_pid = 0;
 
 void handle_sigurs1(int sig, siginfo_t *info, void *context)
 {
+    if(sig == SIGUSR2)
+        exit(0);
    return;	
 }
 
@@ -50,18 +64,19 @@ int main(int argc , char **argv)
   t_sizet buff_len = strlen(GLOBAL_BUFFER);
   printf("SERVER : %d\n" , server_pid);
 
-	while(1)
+	while(index == 0 || GLOBAL_BUFFER[index - 1])
   {
-    printf("%x\n" , GLOBAL_BUFFER[index]);
-    if(++bit_index < 8)
+    if(bit_index++ < 8)
     {
-        unsigned char byte = GLOBAL_BUFFER[index];
-        if(byte & (1u << (8 - bit_index)))
+        char byte = GLOBAL_BUFFER[index];
+        if(byte & (1u << (7 - bit_index)))
         {
+          write(1,"1",1);
           kill(server_pid, SIGUSR1);
         } 
         else
         {
+          write(1,"0",1);
           kill(server_pid, SIGUSR2);
         }
     }
@@ -69,6 +84,7 @@ int main(int argc , char **argv)
     {
       index++;
       bit_index = 0;
+      write(1, " " , 1);
       continue;
     }
    	pause();
