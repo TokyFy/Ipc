@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
 
-#define BUFFER_SIZE 2
+#define BUFFER_SIZE 42
 
 typedef struct byte t_byte;
 typedef int bool;
@@ -34,33 +35,41 @@ void putnumber(int n)
 
 void append_bit(t_byte* byte , bool bit)
 {
-	byte->size++;
+  write(1, "-", 1);
+ 	byte->size++;
   if(bit)
 	  byte->bits |= (1u << (8 - byte->size));
 }
 
 void append_byte(t_byte *byte)
 {	
-//  char *s = GLOBAL_BUFFER;
-//	t_sizet len = strlen(s);
+  char *s = GLOBAL_BUFFER;
+	t_sizet len = strlen(s);
 
-//  if(byte->bits ==  '\0')
-//  {
-//    write(1, s, BUFFER_SIZE);
-//    bzero(GLOBAL_BUFFER, BUFFER_SIZE + 1);
-//    byte->size = 0;
-//    byte->bits = 0;
-//    return;
-//  }
-//
-//  if(len == BUFFER_SIZE)
-//  {
-//    write(1, s, BUFFER_SIZE);
-//    bzero(GLOBAL_BUFFER, BUFFER_SIZE + 1);
-//    return append_byte(byte);
-//  }
-//
-//	s[++len - 1] = (char)byte->bits;	
+  write(1, " ", 1);
+
+  if(byte->bits ==  '\0')
+  {
+    write(1, s, len);
+    byte->size = 0;
+    byte->bits = 0;
+    free(s);
+    GLOBAL_BUFFER = malloc(BUFFER_SIZE);
+    bzero(GLOBAL_BUFFER, BUFFER_SIZE);
+    return;
+  }
+
+ if(len % BUFFER_SIZE == 0)
+ {
+   char* temp = malloc(sizeof(char) * len + BUFFER_SIZE + 1);
+   bzero(temp, len + BUFFER_SIZE + 1);
+   strncpy(temp, s, len + 1);
+   free(s);
+   GLOBAL_BUFFER = temp;
+   s = GLOBAL_BUFFER;
+ }
+
+	s[++len - 1] = (char)byte->bits;	
 	byte->size = 0;
 	byte->bits = 0;
 }
@@ -68,15 +77,17 @@ void append_byte(t_byte *byte)
 void handle_sigurs1(int sig, siginfo_t *info, void *context)
 {
 	static t_byte byte = {0 , 0};
-	
 	append_bit(&byte , sig == SIGUSR1);
+  kill(info->si_pid, SIGUSR1);
 	if(byte.size != 8)
 	  	return;
-
-  write(1, &byte.bits, 1);
-  
 	append_byte(&byte);
+  if(!byte.bits)
+  {
+    kill(info->si_pid, SIGUSR2);
+  }
 }
+
 
 int main()
 {

@@ -21,7 +21,7 @@ for char in $(echo "$string" | fold -w1); do
 
   # Loop through each bit in the binary string
   for bit in {0..7}; do
-    read -t 0.0001  # This line can likely be removed
+    read -t 0.005  # This line can likely be removed
 
     # Extract the current bit value
     bit_value=${binary_string:$bit:1}
@@ -37,7 +37,7 @@ done
 
 # Send SIGUSR2 eight times after the character processing loop
 for num in {0..7}; do
-  read -t 0.0001  # This line can likely be removed
+  read -t 0.005  # This line can likely be removed
   kill -SIGUSR2 "$pid"
 done
 
