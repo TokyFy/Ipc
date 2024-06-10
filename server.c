@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <signal.h>
 
-#define BUFFER_SIZE 42
+#define BUFFER_SIZE 1024
 
 typedef struct byte t_byte;
 typedef int bool;
@@ -20,8 +20,8 @@ struct byte {
 typedef struct server_state
 {
   sig_atomic_t bit;
-  int server_pid;
-  int client_pid;
+  sig_atomic_t server_pid;
+  sig_atomic_t client_pid;
   char *buffer;
 } t_server_state;
 
@@ -36,19 +36,42 @@ void sigurs_handler(int sig, siginfo_t *info, void *context)
    G_STATE.client_pid = info->si_pid;
 }
 
+void save_byte(char a)
+{
+  static int index = 0;
+ 
+  (G_STATE.buffer)[index] = a;
+
+  if(!a)
+  {
+    write(1, G_STATE.buffer, index);
+    index = 0;
+  }
+  index++;
+}
+
 void bits_handler()
 {
-  write(1,"~\n",2);
   static t_byte byte;
   byte.size++;
 
   if(G_STATE.bit)
      byte.bits |= (1u << (8 - byte.size));
 
-  if(byte.size >= 8)
+  if(byte.size == 8)
   {
-    // add byte to the string
+    save_byte(byte.bits);
+    if(!byte.bits)
+    {
+      byte.bits = 0;
+      byte.size = 0;
+      kill(G_STATE.client_pid, SIGUSR2);
+      return;
+    }
+    byte.bits = 0;
+    byte.size = 0;
   }
+  usleep(25);
   kill(G_STATE.client_pid , SIGUSR1);
 }
 
@@ -65,6 +88,8 @@ int main()
 
 	sigaction(SIGUSR1 , &sa , NULL);
 	sigaction(SIGUSR2 , &sa , NULL);
+
+  G_STATE.buffer = calloc(sizeof(char), BUFFER_SIZE);
 
 	while(1)
   {
