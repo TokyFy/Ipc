@@ -13,80 +13,43 @@ typedef int bool;
 typedef unsigned int t_sizet;
 
 struct byte {
-	unsigned char bits;
-	unsigned int size;	
+	sig_atomic_t bits;
+	sig_atomic_t size;	
 };
 
-char *buffer = NULL; 
-#define GLOBAL_BUFFER buffer
-
-void putnumber(int n)
+typedef struct server_state
 {
-  if(n <= 9)
-  {
-    char a = n + '0';
-    write(1 , &a , 1);
-    return;
-  }
-  
-  putnumber(n / 10);
-  putnumber(n % 10);
+  sig_atomic_t bit;
+  int server_pid;
+  int client_pid;
+  char *buffer;
+} t_server_state;
+
+
+volatile t_server_state g_state;
+#define G_STATE g_state
+
+
+void sigurs_handler(int sig, siginfo_t *info, void *context)
+{
+   G_STATE.bit = (sig == SIGUSR1);
+   G_STATE.client_pid = info->si_pid;
 }
 
-void append_bit(t_byte* byte , bool bit)
+void bits_handler()
 {
-  if(bit)
+  write(1,"~\n",2);
+  static t_byte byte;
+  byte.size++;
+
+  if(G_STATE.bit)
+     byte.bits |= (1u << (8 - byte.size));
+
+  if(byte.size >= 8)
   {
-    write(1,"0",1);
+    // add byte to the string
   }
-  else {
-   write(1,"1",1);
-  }
- 	byte->size++;
-  if(bit)
-	  byte->bits |= (1u << (8 - byte->size));
-}
-
-void append_byte(t_byte *byte)
-{	
-  char *s = GLOBAL_BUFFER;
-	t_sizet len = strlen(s);
-
-  if(byte->bits ==  '\0')
-  {
-    write(1, s, len);
-    byte->size = 0;
-    byte->bits = 0;
-    free(s);
-    GLOBAL_BUFFER = malloc(BUFFER_SIZE);
-    bzero(GLOBAL_BUFFER, BUFFER_SIZE);
-    return;
-  }
-
- if(len % BUFFER_SIZE == 0)
- {
-   char* temp = malloc(sizeof(char) * len + BUFFER_SIZE + 1);
-   bzero(temp, len + BUFFER_SIZE + 1);
-   strncpy(temp, s, len + 1);
-   free(s);
-   GLOBAL_BUFFER = temp;
-   s = GLOBAL_BUFFER;
- }
-  write(1,"  ",2);
-	s[++len - 1] = (char)byte->bits;	
-	byte->size = 0;
-	byte->bits = 0;
-}
-
-void handle_sigurs1(int sig, siginfo_t *info, void *context)
-{
-	static t_byte byte = {0 , 0};
-	append_bit(&byte , sig == SIGUSR1);
-  kill(info->si_pid, SIGUSR1);
-	if(byte.size != 8)
-	  	return;
-  
-	append_byte(&byte);
+  kill(G_STATE.client_pid , SIGUSR1);
 }
 
 
@@ -94,10 +57,9 @@ int main()
 {
 	pid_t pid = getpid();
 	printf("PID : %d\n" , pid);
-	GLOBAL_BUFFER = calloc(sizeof(char) , BUFFER_SIZE + 1);
 
 	struct sigaction sa;
-	sa.sa_sigaction = handle_sigurs1;
+	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;
 
@@ -105,7 +67,10 @@ int main()
 	sigaction(SIGUSR2 , &sa , NULL);
 
 	while(1)
+  {
 		pause();
+    bits_handler();
+  }
 
 	return 0;
 }
