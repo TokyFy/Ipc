@@ -12,6 +12,8 @@ server: server.c libft/libft.a
 libft/libft.a:
 	$(MAKE) -C libft
 
+bonus: all
+
 clean:
 	rm -f client server
 	$(MAKE) -C libft clean
