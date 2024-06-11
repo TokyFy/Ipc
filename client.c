@@ -6,10 +6,11 @@
 /*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/11 10:05:25 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/11 10:49:55 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minitalk.h"
+#include <unistd.h>
 
 volatile t_client_state	g_state;
 #define G_STATE g_state
@@ -23,7 +24,10 @@ void	sigurs_handler(int sig, siginfo_t *info, void *context)
 		G_STATE.received = 1;
 	}
 	if (sig == SIGUSR2)
+  {
+    write(1, "~~ Message received\n", 20);
 		exit(0);
+  }
 	return ;
 }
 
