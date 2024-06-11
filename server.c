@@ -6,7 +6,7 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:22:23 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/10 15:22:27 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/11 10:01:06 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ volatile t_server_state	g_state;
 
 void	sigurs_handler(int sig, siginfo_t *info, void *context)
 {
+	(void)(info);
+	(void)(context);
 	G_STATE.bit = (sig == SIGUSR1);
 	G_STATE.client_pid = info->si_pid;
 }
@@ -26,10 +28,14 @@ void	save_byte(char a)
 	static int	index = 0;
 	char		*mem;
 
+	if (!G_STATE.buffer)
+	{
+		G_STATE.buffer = malloc(sizeof(char) * BUFFER_SIZE);
+	}
 	if ((index) % BUFFER_SIZE == 0)
 	{
-		mem = calloc(sizeof(char), index + BUFFER_SIZE + 1);
-		strcpy(mem, G_STATE.buffer);
+		mem = malloc(sizeof(char) * index + BUFFER_SIZE + 1);
+		ft_strlcpy(mem, G_STATE.buffer, index);
 		G_STATE.buffer = mem;
 	}
 	(G_STATE.buffer)[index] = a;
@@ -58,13 +64,15 @@ void	bits_handler(void)
 		{
 			byte.bits = 0;
 			byte.size = 0;
+			free(G_STATE.buffer);
+			G_STATE.buffer = NULL;
 			kill(G_STATE.client_pid, SIGUSR2);
 			return ;
 		}
 		byte.bits = 0;
 		byte.size = 0;
 	}
-	usleep(5);
+	usleep(1);
 	kill(G_STATE.client_pid, SIGUSR1);
 }
 
@@ -74,13 +82,14 @@ int	main(void)
 	struct sigaction	sa;
 
 	pid = getpid();
-	printf("PID : %d\n", pid);
+	write(1, "PID : ", 6);
+	ft_putnbr_fd(pid, 1);
+	write(1, " \n", 2);
 	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
-	G_STATE.buffer = calloc(sizeof(char), BUFFER_SIZE);
 	while (1)
 	{
 		pause();

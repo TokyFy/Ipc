@@ -6,15 +6,13 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:41:58 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/10 15:57:23 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/11 10:01:06 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft/libft.h"
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <strings.h>
 #include <sys/types.h>
 #include <unistd.h>
 
