@@ -6,7 +6,7 @@
 /*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/12 11:49:16 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/12 15:44:02 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minitalk.h"
@@ -24,10 +24,10 @@ void	sigurs_handler(int sig, siginfo_t *info, void *context)
 		G_STATE.received = 1;
 	}
 	if (sig == SIGUSR2)
-  {
-    write(1, "~~ Message received\n", 20);
+	{
+		write(1, "~~ Message received\n", 20);
 		exit(0);
-  }
+	}
 	return ;
 }
 
@@ -38,7 +38,7 @@ void	send_byte(unsigned char byte, pid_t pid)
 	bit_index = 0;
 	while (bit_index++ < 8)
 	{
-    usleep(15);
+		usleep(15);
 		if (byte & (1u << (8 - bit_index)))
 		{
 			kill(pid, SIGUSR1);
@@ -62,26 +62,22 @@ int	main(int argc, char **argv)
 
 	if (argc != 3)
 		return (1);
-	G_STATE.server_pid = atoi(argv[1]);
-  G_STATE.received = 0;
-
+	G_STATE.server_pid = ft_atoi(argv[1]);
+	G_STATE.received = 0;
 	if (kill(G_STATE.server_pid, 0))
 	{
 		write(1, "Error : Server not found\n", 25);
 		return (1);
 	}
-
 	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;
-	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
+	sigaction(SIGUSR1, &sa, NULL);
 	str = argv[2];
 	while (1)
 	{
 		send_byte(*(str), G_STATE.server_pid);
-		if (!*str)
-			break ;
 		str++;
 	}
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:22:23 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/12 11:45:01 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/12 15:46:49 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,46 +24,34 @@ void	sigurs_handler(int sig, siginfo_t *info, void *context)
 	(void)(info);
 	(void)(context);
 	G_STATE.bit = (sig == SIGUSR1);
-
- 	G_STATE.client_pid = info->si_pid;
+	G_STATE.client_pid = info->si_pid;
 }
 
-void loging()
+void	loging(void)
 {
-  write(1, "\e[1;1H\e[2J", 11);
-
-  write(1, "PID : ", 6);
+	write(1, "\e[1;1H\e[2J", 11);
+	write(1, "PID : ", 6);
 	ft_putnbr_fd(G_STATE.server_pid, 1);
 	write(1, " \n\nByte received : ", 18);
-  ft_putnbr_fd(G_STATE.bit_c, 1);
-  write(1, "\n", 1);
+	ft_putnbr_fd(G_STATE.bit_c, 1);
+	write(1, "\n", 1);
 }
 
-void write_c(void *ptr)
+void	write_c(void *ptr)
 {
-  write(1, (char *)ptr, 1);
+	write(1, (char *)ptr, 1);
 }
 
 void	save_byte(char a)
 {
-  G_STATE.bit_c++;
+	char	*c;
 
-  char *c = malloc(sizeof(char));
-  *c = a;
-
-  ft_lstadd_back(&G_STATE.buffer_lst, ft_lstnew(c));
-
-  loging();
-
-	if (!a)
-	{
-    ft_lstiter(G_STATE.buffer_lst, write_c);
-    ft_lstclear(&G_STATE.buffer_lst, free);
-    G_STATE.buffer_lst = NULL;
-	}
+	G_STATE.bit_c++;
+	c = malloc(sizeof(char));
+	*c = a;
+	ft_lstadd_back(&G_STATE.buffer_lst, ft_lstnew(c));
+	loging();
 }
-
-
 
 void	bits_handler(void)
 {
@@ -74,24 +62,24 @@ void	bits_handler(void)
 		byte.bits |= (1u << (8 - byte.size));
 	if (byte.size == 8)
 	{
-		save_byte(byte.bits);
 		if (!byte.bits)
 		{
+			kill(G_STATE.client_pid, SIGUSR2);
 			byte.bits = 0;
 			byte.size = 0;
-			free(G_STATE.buffer);
-			G_STATE.buffer = NULL;
-      G_STATE.bit_c = 0;
-			kill(G_STATE.client_pid, SIGUSR2);
+			G_STATE.bit_c = 0;
+      ft_lstiter(G_STATE.buffer_lst, write_c);
+		  ft_lstclear(&G_STATE.buffer_lst, free);
+		  G_STATE.buffer_lst = NULL;
 			return ;
 		}
+    save_byte(byte.bits);
 		byte.bits = 0;
 		byte.size = 0;
 	}
 	usleep(15);
 	kill(G_STATE.client_pid, SIGUSR1);
 }
-
 
 int	main(void)
 {
@@ -101,10 +89,8 @@ int	main(void)
 	write(1, "PID : ", 6);
 	ft_putnbr_fd(G_STATE.server_pid, 1);
 	write(1, " \n", 2);
-
-  G_STATE.buffer = NULL;
-  G_STATE.bit_c = 0;
-
+  G_STATE.bit = 0;
+	G_STATE.bit_c = 0;
 	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;

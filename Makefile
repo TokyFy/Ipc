@@ -1,7 +1,10 @@
+NAME=minitalk
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-all: libft client server
+$(NAME) : libft client server
+
+all: $(NAME)
 
 client: client.c libft/libft.a
 	$(CC) $(CFLAGS) -o client client.c libft/libft.a
