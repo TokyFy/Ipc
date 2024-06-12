@@ -6,7 +6,7 @@
 /*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/11 10:49:55 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:49:16 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minitalk.h"
@@ -38,7 +38,7 @@ void	send_byte(unsigned char byte, pid_t pid)
 	bit_index = 0;
 	while (bit_index++ < 8)
 	{
-		usleep(1);
+    usleep(15);
 		if (byte & (1u << (8 - bit_index)))
 		{
 			kill(pid, SIGUSR1);
@@ -63,11 +63,14 @@ int	main(int argc, char **argv)
 	if (argc != 3)
 		return (1);
 	G_STATE.server_pid = atoi(argv[1]);
+  G_STATE.received = 0;
+
 	if (kill(G_STATE.server_pid, 0))
 	{
 		write(1, "Error : Server not found\n", 25);
 		return (1);
 	}
+
 	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;

@@ -6,7 +6,7 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:41:58 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/11 10:01:06 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:39:18 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ typedef struct s_server_state
 	sig_atomic_t			server_pid;
 	sig_atomic_t			client_pid;
 	char					*buffer;
+  t_list *buffer_lst;
+  sig_atomic_t bit_c;
 }							t_server_state;
 
 typedef struct s_client_state

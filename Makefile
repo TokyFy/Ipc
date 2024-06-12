@@ -10,7 +10,7 @@ server: server.c libft/libft.a
 	$(CC) $(CFLAGS) -o server server.c libft/libft.a
 
 libft/libft.a:
-	$(MAKE) -C libft
+	$(MAKE) bonus -C libft
 
 bonus: all
 
