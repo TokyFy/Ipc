@@ -6,7 +6,7 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:22:23 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/13 11:09:28 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:52:48 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,20 +55,21 @@ void	bits_handler(void)
 	{
 		if (!byte.bits)
 		{
-			kill(G_STATE.client_pid, SIGUSR2);
 			byte.bits = 0;
 			byte.size = 0;
 			G_STATE.bit_c = 0;
 			ft_lstiter(G_STATE.buffer_lst, write_c);
 			ft_lstclear(&G_STATE.buffer_lst, free);
 			G_STATE.buffer_lst = NULL;
+			usleep(50);
+			kill(G_STATE.client_pid, SIGUSR2);
 			return ;
 		}
 		save_byte(byte.bits);
 		byte.bits = 0;
 		byte.size = 0;
 	}
-	usleep(15);
+	usleep(50);
 	kill(G_STATE.client_pid, SIGUSR1);
 }
 

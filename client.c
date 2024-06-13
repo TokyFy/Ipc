@@ -6,7 +6,7 @@
 /*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/13 08:47:20 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:46:19 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minitalk.h"
@@ -37,7 +37,7 @@ void	send_byte(unsigned char byte, pid_t pid)
 	bit_index = 0;
 	while (bit_index++ < 8)
 	{
-		usleep(15);
+		usleep(50);
 		if (byte & (1u << (8 - bit_index)))
 		{
 			kill(pid, SIGUSR1);
