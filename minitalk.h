@@ -6,15 +6,18 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:41:58 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/12 15:43:42 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:10:17 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
-#include <signal.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
+#ifndef MINITALK_H
+# define MINITALK_H
+
+# include "libft/libft.h"
+# include <signal.h>
+# include <stdlib.h>
+# include <sys/types.h>
+# include <unistd.h>
 
 typedef struct s_byte		t_byte;
 typedef unsigned int		t_sizet;
@@ -40,3 +43,7 @@ typedef struct s_client_state
 	pid_t					server_pid;
 	volatile sig_atomic_t	received;
 }							t_client_state;
+
+void						write_c(void *ptr);
+
+#endif // !MINITALK_H

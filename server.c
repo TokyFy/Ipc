@@ -6,15 +6,11 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:22:23 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/12 15:46:49 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/13 11:09:28 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
 #include "minitalk.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 t_server_state	g_state;
 #define G_STATE g_state
@@ -35,11 +31,6 @@ void	loging(void)
 	write(1, " \n\nByte received : ", 18);
 	ft_putnbr_fd(G_STATE.bit_c, 1);
 	write(1, "\n", 1);
-}
-
-void	write_c(void *ptr)
-{
-	write(1, (char *)ptr, 1);
 }
 
 void	save_byte(char a)
@@ -68,12 +59,12 @@ void	bits_handler(void)
 			byte.bits = 0;
 			byte.size = 0;
 			G_STATE.bit_c = 0;
-      ft_lstiter(G_STATE.buffer_lst, write_c);
-		  ft_lstclear(&G_STATE.buffer_lst, free);
-		  G_STATE.buffer_lst = NULL;
+			ft_lstiter(G_STATE.buffer_lst, write_c);
+			ft_lstclear(&G_STATE.buffer_lst, free);
+			G_STATE.buffer_lst = NULL;
 			return ;
 		}
-    save_byte(byte.bits);
+		save_byte(byte.bits);
 		byte.bits = 0;
 		byte.size = 0;
 	}
@@ -89,7 +80,7 @@ int	main(void)
 	write(1, "PID : ", 6);
 	ft_putnbr_fd(G_STATE.server_pid, 1);
 	write(1, " \n", 2);
-  G_STATE.bit = 0;
+	G_STATE.bit = 0;
 	G_STATE.bit_c = 0;
 	sa.sa_sigaction = sigurs_handler;
 	sigemptyset(&sa.sa_mask);

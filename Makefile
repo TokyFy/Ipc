@@ -1,16 +1,18 @@
 NAME=minitalk
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
+UTILS = utils.c
 
 $(NAME) : libft client server
 
 all: $(NAME)
 
+
 client: client.c libft/libft.a
-	$(CC) $(CFLAGS) -o client client.c libft/libft.a
+	$(CC) $(CFLAGS) -o client $(UTILS) client.c libft/libft.a
 
 server: server.c libft/libft.a
-	$(CC) $(CFLAGS) -o server server.c libft/libft.a
+	$(CC) $(CFLAGS) -o server $(UTILS) server.c libft/libft.a
 
 libft/libft.a:
 	$(MAKE) bonus -C libft

@@ -6,11 +6,10 @@
 /*   By: franaivo <tokyfy@outlook.com>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/05 20:07:12 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/12 15:44:02 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/13 08:47:20 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minitalk.h"
-#include <unistd.h>
 
 volatile t_client_state	g_state;
 #define G_STATE g_state
