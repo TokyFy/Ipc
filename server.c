@@ -6,7 +6,7 @@
 /*   By: franaivo <franaivo@student.42antananarivo  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 15:22:23 by franaivo          #+#    #+#             */
-/*   Updated: 2024/06/13 11:52:48 by franaivo         ###   ########.fr       */
+/*   Updated: 2024/06/17 09:03:25 by franaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ void	save_byte(char a)
 	c = malloc(sizeof(char));
 	*c = a;
 	ft_lstadd_back(&G_STATE.buffer_lst, ft_lstnew(c));
-	loging();
+  if(G_STATE.bit_c > 105)
+	  loging();
 }
 
 void	bits_handler(void)
